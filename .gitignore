@@ -30,3 +30,39 @@
 *.exe
 *.out
 *.app
+
+# Build results
+[Bb]in/
+[Oo]bj/
+Debug/
+Release/
+x64/
+x86/
+*.log
+*.tlog
+*.lastbuildstate
+*.obj
+*.ilk
+*.pdb
+*.pch
+*.idb
+*.ipch
+*.res
+*.exe.recipe
+*.cache
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Project outputs
+*.exe
+*.dll
+*.lib
+
+# Others
+*.VC.db
+*.VC.opendb

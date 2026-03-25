@@ -21,20 +21,42 @@ int main()
 	INT addr_len = sizeof(server_addr);
 	SOCKET c_socket = WSAAccept(s_socket, reinterpret_cast<SOCKADDR*>(&server_addr), &addr_len, nullptr, 0);
 
+
+	int playerX{ 4 }, playerY{ 4 };
 	for (;;) {
 		char recv_buffer[BUFFER_SIZE]{};
 		WSABUF recv_wsa_buf{ BUFFER_SIZE, recv_buffer };
 		DWORD recv_size = 0;
 		DWORD rec_flag = 0;
-		WSARecv(c_socket, &recv_wsa_buf, 1, &recv_size, &rec_flag, nullptr, nullptr);
+		int result = WSARecv(c_socket, &recv_wsa_buf, 1, &recv_size, &rec_flag, nullptr, nullptr);
+
+		if (result == SOCKET_ERROR){
+			break;
+		}
 
 		std::cout << "Received from client: " << recv_buffer << std::endl;
-		std::cout << "SIZE: " << recv_size << std::endl;
+
+
+		if (strcmp(recv_buffer, "KEY LEFT") == 0) {
+			if (playerX > 0) playerX--;
+		}
+		else if (strcmp(recv_buffer, "KEY RIGHT") == 0) {
+			if (playerX < 7) playerX++;
+		}
+		else if (strcmp(recv_buffer, "KEY UP") == 0) {
+			if (playerY > 0) playerY--;
+		}
+		else if (strcmp(recv_buffer, "KEY DOWN") == 0) {
+			if (playerY < 7) playerY++;
+		}
+
+		char send_buffer[BUFFER_SIZE]{};
+		sprintf_s(send_buffer, "POS %d %d", playerX, playerY);
+
+		WSABUF send_wsa_buf{static_cast<ULONG>(strlen(send_buffer)) + 1, send_buffer};
 
 		DWORD sent_size = 0;
-		WSABUF send_wsa_buf = { recv_size, recv_buffer };
 		WSASend(c_socket, &send_wsa_buf, 1, &sent_size, 0, nullptr, nullptr);
-
 
 		std::cout << recv_size << "Sent to client: " << '\n';
 	}

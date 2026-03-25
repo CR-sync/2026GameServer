@@ -33,6 +33,7 @@ int main()
 		if (result == SOCKET_ERROR){
 			break;
 		}
+		recv_buffer[recv_size] = '\0';
 
 		std::cout << "Received from client: " << recv_buffer << std::endl;
 
@@ -58,7 +59,7 @@ int main()
 		DWORD sent_size = 0;
 		WSASend(c_socket, &send_wsa_buf, 1, &sent_size, 0, nullptr, nullptr);
 
-		std::cout << recv_size << "Sent to client: " << '\n';
+		std::cout << "Sent to client: " << '\n';
 	}
 	WSACleanup();
 }

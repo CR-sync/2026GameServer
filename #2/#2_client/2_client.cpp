@@ -47,11 +47,18 @@ int main()
 		error_display(L"서버 연결 실패", WSAGetLastError());
 		return 1;
 	}
-
+	std::cout << "Connected to server!" << '\n' << "Push arrow keys" << '\n';
 	int playerX{ 4 }, playerY{ 4 };	// 플레이어 초기 세팅 장소
 	initBoard();
+	Board[playerX][playerY] = 'O';
+	printBoard();
+
 	for (;;) {
 		int key = _getch();
+		if (key == 224 || key == 0) {
+			key = _getch();
+		}
+
 		std::string sendMsg;
 
 		switch (key) {
@@ -73,7 +80,7 @@ int main()
 
 		char buffer[BUFFER_SIZE]{};
 
-		WSABUF wsa_buf{ static_cast<ULONG>(strlen(buffer)) + 1, (CHAR*)sendMsg.c_str()};
+		WSABUF wsa_buf{ static_cast<ULONG>(sendMsg.size()) + 1, (CHAR*)sendMsg.c_str()};
 		DWORD sent_size = 0;
 		int result = WSASend(s_socket, &wsa_buf, 1, &sent_size, 0, nullptr, nullptr);
 
@@ -101,7 +108,7 @@ int main()
 		}
 		system("cls");
 		initBoard();
-		Board[playerX][playerY] = 'P';
+		Board[playerX][playerY] = 'O';
 		printBoard();
 	}
 	WSACleanup();

@@ -1,7 +1,8 @@
 #include <iostream>
 #include <WS2tcpip.h>	//윈도우 소켓 라이브러리
+#include <conio.h>
 
-#pragma comment(lib, "ws2_32.lib")	//32가 64비트도 됨
+#pragma comment(lib, "ws2_32.lib")
 
 constexpr short SERVER_PORT = 3000;
 constexpr int BUFFER_SIZE = 4000;
@@ -29,19 +30,18 @@ void error_display(const wchar_t* msg, int err_no)
 
 int main()
 {
-
 	std::string serverIP;
 	std::cout << "Enter Server IP: ";
 	std::cin >> serverIP;
 
 	std::wcout.imbue(std::locale("korean"));
 	WSADATA wsa_data{};
-	WSAStartup(MAKEWORD(2, 2), &wsa_data);	//윈도우 소켓 초기화 리눅스에서 하면 makeword는 필요없음 but 윈도우에서는 필요함
-	SOCKET s_socket(WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, 0));	//소켓 생성
-	SOCKADDR_IN server_addr{};	//서버 주소 구조체
-	server_addr.sin_family = AF_INET;	//주소 체계
-	server_addr.sin_port = htons(SERVER_PORT);	//포트 번호
-	inet_pton(AF_INET, serverIP.c_str(), &server_addr.sin_addr);	//IP 주소 변환 sin_addr에 숫자로 바꿔서 저장을 해라.
+	WSAStartup(MAKEWORD(2, 2), &wsa_data);
+	SOCKET s_socket(WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, 0));
+	SOCKADDR_IN server_addr{};
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(SERVER_PORT);
+	inet_pton(AF_INET, serverIP.c_str(), &server_addr.sin_addr);
 	int result = WSAConnect(s_socket, reinterpret_cast<SOCKADDR*>(&server_addr), sizeof(server_addr), nullptr, nullptr, nullptr, nullptr);	//서버에 연결
 	if (result == SOCKET_ERROR) {
 		error_display(L"서버 연결 실패", WSAGetLastError());
@@ -49,12 +49,32 @@ int main()
 	}
 
 	for (;;) {
+		int key = _getch();
+		std::string sendMsg;
+
+		switch (key) {
+		case 75:
+			sendMsg = "KEY LEFT";
+			break;
+		case 77:
+			sendMsg = "KEY RIGHT";
+			break;
+		case 72:
+			sendMsg = "KEY UP";
+			break;
+		case 80:
+			sendMsg = "KEY DOWN";
+			break;
+		default:
+			continue;
+		}
+
 		char buffer[BUFFER_SIZE]{};
 		std::string input;
 		std::cout << "Enter message to send: ";
 		std::cin.getline(buffer, BUFFER_SIZE);
 
-		WSABUF wsa_buf{ static_cast<ULONG>(strlen(buffer)) + 1, buffer };	//ULONG은 윈도우에만 있음 unsigned longlong이어도 됨
+		WSABUF wsa_buf{ static_cast<ULONG>(strlen(buffer)) + 1, buffer };
 		DWORD sent_size = 0;
 		int result = WSASend(s_socket, &wsa_buf, 1, &sent_size, 0, nullptr, nullptr);
 

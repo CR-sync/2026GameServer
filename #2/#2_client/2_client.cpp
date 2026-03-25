@@ -70,9 +70,6 @@ int main()
 		}
 
 		char buffer[BUFFER_SIZE]{};
-		std::string input;
-		std::cout << "Enter message to send: ";
-		std::cin.getline(buffer, BUFFER_SIZE);
 
 		WSABUF wsa_buf{ static_cast<ULONG>(strlen(buffer)) + 1, buffer };
 		DWORD sent_size = 0;
@@ -87,9 +84,13 @@ int main()
 		WSABUF recv_wsa_buf{ BUFFER_SIZE, recv_buffer };
 		DWORD recv_size = 0;
 		DWORD rec_flag = 0;
-		WSARecv(s_socket, &recv_wsa_buf, 1, &recv_size, &rec_flag, nullptr, nullptr);
-		std::cout << "Received from server: " << recv_buffer << std::endl;
-		std::cout << "SIZE: " << recv_size << std::endl;
+		result = WSARecv(s_socket, &recv_wsa_buf, 1, &recv_size, &rec_flag, nullptr, nullptr);
+		if (result == SOCKET_ERROR)
+		{
+			error_display(L"좌표 수신 실패", WSAGetLastError());
+			break;
+		}
+
 	}
 	WSACleanup();
 }

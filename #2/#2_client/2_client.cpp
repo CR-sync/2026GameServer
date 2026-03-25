@@ -48,6 +48,8 @@ int main()
 		return 1;
 	}
 
+	int playerX{ 4 }, playerY{ 4 };	// 플레이어 초기 세팅 장소
+	initBoard();
 	for (;;) {
 		int key = _getch();
 		std::string sendMsg;
@@ -71,7 +73,7 @@ int main()
 
 		char buffer[BUFFER_SIZE]{};
 
-		WSABUF wsa_buf{ static_cast<ULONG>(strlen(buffer)) + 1, buffer };
+		WSABUF wsa_buf{ static_cast<ULONG>(strlen(buffer)) + 1, (CHAR*)sendMsg.c_str()};
 		DWORD sent_size = 0;
 		int result = WSASend(s_socket, &wsa_buf, 1, &sent_size, 0, nullptr, nullptr);
 
@@ -91,6 +93,16 @@ int main()
 			break;
 		}
 
+		int x, y;
+
+		if (sscanf_s(recv_buffer, "POS %d %d", &x, &y) == 2) {
+			playerX = x;
+			playerY = y;
+		}
+		system("cls");
+		initBoard();
+		Board[playerX][playerY] = 'P';
+		printBoard();
 	}
 	WSACleanup();
 }
